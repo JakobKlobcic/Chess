@@ -23,7 +23,7 @@ public class ChessBoardI implements ChessBoard{
     public ChessPiece getPiece(ChessPosition position) {
         ChessPieceI result;
         try{
-            result=(ChessPieceI) board[position.getRow()-1][position.getColumn()-1];
+            result= board[position.getRow()-1][position.getColumn()-1];
         }catch(ArrayIndexOutOfBoundsException e){
             return null;
         }
@@ -51,6 +51,8 @@ public class ChessBoardI implements ChessBoard{
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if(board[i][j] != null && board[i][j].getPieceType().toString()=="KING" && board[i][j].team==color){
+                    System.out.println(i);
+                    System.out.println(j);
                     return new ChessPositionI(i+1,j+1);
                 }
             }
@@ -70,7 +72,7 @@ public class ChessBoardI implements ChessBoard{
         ChessPieceI[][] result = new ChessPieceI[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                result[i][j] =board[i][j];
+                result[j][i] =board[j][i];
             }
         }
         return result;
