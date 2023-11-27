@@ -26,4 +26,8 @@ public class Response{
 	public void setStatus(Integer status){
 		this.status = status;
 	}
+
+	public String getMessage(){
+		return message;
+	}
 }

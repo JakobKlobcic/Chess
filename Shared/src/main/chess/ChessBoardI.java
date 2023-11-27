@@ -3,6 +3,7 @@ package chess;
 import chess.Pieces.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ChessBoardI implements ChessBoard{
@@ -37,12 +38,14 @@ public class ChessBoardI implements ChessBoard{
 		board[move.starting.row - 1][move.starting.column - 1] = null;
 	}
 
-	public List<ChessMove> getTeamMoves(ChessGame.TeamColor color){
-		List<ChessMove> result = new ArrayList<>();
+	public List<ChessMoveI> getTeamMoves(ChessGame.TeamColor color){
+		List<ChessMoveI> result = new ArrayList<>();
 		for(int i = 0; i < 8; i++){
 			for(int j = 0; j < 8; j++){
 				if(board[i][j] != null && board[i][j].team == color){
-					result.addAll(board[i][j].pieceMoves(this, new ChessPositionI(i + 1, j + 1)));
+					for(ChessMove move : board[i][j].pieceMoves(this, new ChessPositionI(i + 1, j + 1))){
+						result.add((ChessMoveI)move);
+					}
 				}
 			}
 		}

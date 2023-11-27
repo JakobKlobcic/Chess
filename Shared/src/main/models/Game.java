@@ -83,6 +83,9 @@ public class Game{
 		return game;
 	}
 
+	public ChessGameImplementation getGameI(){
+		return game;
+	}
 	public void setGame(ChessGame game){
 		this.game =(ChessGameImplementation) game;
 	}

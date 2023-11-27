@@ -8,9 +8,9 @@ public class ChessGameImplementation implements ChessGame{
 	ChessBoardI board;
 	TeamColor turn;
 
-	List<ChessMove> whiteMoves;
+	List<ChessMoveI> whiteMoves;
 
-	List<ChessMove> blackMoves;
+	List<ChessMoveI> blackMoves;
 
 	public ChessGameImplementation(){
 		board = new ChessBoardI();
@@ -133,7 +133,7 @@ public class ChessGameImplementation implements ChessGame{
 	public boolean isInCheck(TeamColor teamColor){
 		ChessPositionI kingPosition = (ChessPositionI)board.getTeamKing(teamColor);
 		TeamColor oppositeTeam = teamColor == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
-		List<ChessMove> moves = board.getTeamMoves(oppositeTeam);
+		List<ChessMoveI> moves = board.getTeamMoves(oppositeTeam);
 		for(ChessMove move : moves){
 			ChessPieceI piece = (ChessPieceI)board.getPiece(move.getStartPosition());
 			if(!(piece.type == ChessPiece.PieceType.PAWN && move.getStartPosition().getColumn() == move.getEndPosition().getColumn()) && move.getEndPosition().equals(kingPosition)){
@@ -204,6 +204,10 @@ public class ChessGameImplementation implements ChessGame{
 
 	@Override
 	public ChessBoard getBoard(){
+		return board;
+	}
+
+	public ChessBoardI getBoardI(){
 		return board;
 	}
 }
