@@ -1,8 +1,6 @@
 package dataAccess;
 
-import models.Authtoken;
-import models.User;
-
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -11,70 +9,82 @@ import java.util.*;
  *
  * @author Jakob Klobcic
  */
-public class AuthDAO {
+public class AuthDAO{
+	Database db = Database.getInstance();
 
-    Set<Authtoken> tokens = new HashSet<>();
-    /**
-     * Retrieves an Authorization token for some user.
-     *
-     * @param user the user for whom the token is to be retrieved
-     * @return currently returns null because of non-implementation
-     */
-    public Authtoken getToken(User user){
-        for(Authtoken token : tokens) {
-            if(token.getUsername().equals(user.getUsername())){
-                return token;
-            }
-        }
-        return null;
-    }
+	public void removeToken(String t) throws DataAccessException{
+		Connection conn = null;
+		try {
+			conn = db.getConnection();
+			String sql = "DELETE FROM authtoken WHERE token = ?";
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setString(1, t);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			throw new DataAccessException(e.toString());
+		} finally {
+			if (conn != null) {
+				db.returnConnection(conn);
+			}
+		}
+	}
 
-    public void removeToken(String t){
-        for(Authtoken token : tokens) {
-            if(token.getAuthToken().equals(t)){
-                tokens.remove(token);
-                return;
-            }
-        }
-    }
+	public boolean tokenExists(String t)throws DataAccessException{
+		Connection conn = null;
 
-    public boolean tokenExists(String t){
-        if(t.equals("")){
-            return false;
-        }
-        for(Authtoken token : tokens) {
-            if(token.getAuthToken().equals(t)){
-                return true;
-            }
-        }
-        return false;
-    }
+		String sql = "SELECT * FROM authtoken WHERE token = ?";
+		try {
+			conn = db.getConnection();
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setString(1, t);
+			ResultSet rs = stmt.executeQuery();
+			return rs.next();
+		} catch (SQLException e) {
+			System.out.println(e);
+			throw new DataAccessException(e.toString());
+		}
+	}
 
-    public String username(String t){
-        for(Authtoken token : tokens) {
-            if(Objects.equals(token.getAuthToken(), t)){
-                return token.getUsername();
-            }
-        }
-        return null;
-    }
+	public String username(String t)throws DataAccessException{
+		Connection conn = null;
 
-    /**
-     * Creates a new Authorization token.
-     */
-    public String createToken(String username){
-        String id = UUID.randomUUID().toString();
-        tokens.add(new Authtoken(username, id));
-        return id;
-    }
+		conn = db.getConnection();
+		String sql = "SELECT u.username FROM user u INNER JOIN authtoken a ON u.id = a.user_id WHERE a.token = ?"; //TODO: join authtoken and user tables to get username
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setString(1, t);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				return rs.getString("username");
+			} else {
+				// If no entry is found, you might want to return null or handle it accordingly
+				return null;
+			}
+		} catch (SQLException e) {
+			throw new DataAccessException(e.toString());
+		}
+	}
 
-    /**
-     * Updates an existing Authorization token.
-     */
-    void updateToken(){}
+	/**
+	 * Creates a new Authorization token.
+	 */
+	public String createToken(String username)throws DataAccessException{
 
-    /**
-     * Deletes an existing Authorization token.
-     */
-    void deleteToken(){}
+		String token = UUID.randomUUID().toString();
+		Connection conn = null;
+		try {
+			conn = db.getConnection();
+			String sql = "INSERT INTO authtoken (token, user_id)\n SELECT ?, id FROM user WHERE username = ?;";
+			PreparedStatement createStmt = conn.prepareStatement(sql);
+			createStmt.setString(1, token);
+			createStmt.setString(2, username);
+			createStmt.executeUpdate();
+		} catch (SQLException e) {
+			throw new DataAccessException(e.toString());
+		} finally {
+			if (conn != null) {
+				db.returnConnection(conn);
+			}
+		}
+		return token;
+	}
 }

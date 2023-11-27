@@ -290,7 +290,7 @@ public class StandardAPITests {
         //make watch request
         TestModels.TestJoinRequest watchRequest = new TestModels.TestJoinRequest();
         watchRequest.gameID = createResult.gameID;
-
+        System.out.println(watchRequest.toString());
         //try watch
         TestModels.TestResult watchResult = serverFacade.verifyJoinPlayer(watchRequest, existingAuth);
 
@@ -673,6 +673,12 @@ public class StandardAPITests {
         Collection<TestModels.TestListResult.TestListEntry> returnedList =
                 new HashSet<>(Arrays.asList(listResult.games));
 
+        for(int i = 0; i<expectedList.size(); i++){
+            System.out.println("----------------------");
+            System.out.println(listResult.games[i].gameID);
+            System.out.println(listResult.games[i].blackUsername);
+            System.out.println(listResult.games[i].whiteUsername);
+        }
         //check
         Assertions.assertEquals(expectedList, returnedList, "Returned Games list was incorrect");
     }
