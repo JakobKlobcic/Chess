@@ -115,6 +115,7 @@ public class main{
 		System.out.println(message);
 		this.requestInput();
 	}
+
 	public void help(){
 		if(signedIn){
 			System.out.print(
@@ -143,7 +144,7 @@ public class main{
 			if(response.getStatus()==200){
 				this.drawBoard(getBoard(gameID));
 			}else{
-				//TODO: Throw exception
+				System.out.println(response.getMessage());
 			}
 		}catch(IOException e){
 			throw new RuntimeException(e);
@@ -157,7 +158,7 @@ public class main{
 			if(response.getStatus()==200){
 				this.drawBoard(getBoard(gameID));
 			}else{
-				//TODO: Throw exception
+				System.out.println(response.getMessage());
 			}
 		}catch(IOException e){
 			throw new RuntimeException(e);
@@ -173,7 +174,7 @@ public class main{
 				signedIn=true;
 				auth= response.getAuthToken();
 			}else{
-				//TODO: Throw exception
+				System.out.println(response.getMessage());
 			}
 		}catch(IOException e){
 			throw new RuntimeException(e);
@@ -204,7 +205,7 @@ public class main{
 					System.out.println("|\t"+game.getGameID()+"\t|\t"+game.getGameName());
 				}
 			}else{
-				//TODO: Throw exception
+				System.out.println(response.getMessage());
 			}
 		}catch(IOException e){
 			throw new RuntimeException(e);
@@ -220,7 +221,7 @@ public class main{
 				auth = response.getAuthToken();
 				System.out.println("Logged in as: "+response.getUsername());
 			}else{
-				//TODO: Throw exception
+				System.out.println(response.getMessage());
 			}
 		}catch(IOException e){
 			throw new RuntimeException(e);
@@ -236,7 +237,7 @@ public class main{
 				auth = null;
 				System.out.println("Successfully Logged out!");
 			}else{
-				//TODO: Throw exception
+				System.out.println(response.getMessage());
 			}
 		}catch(IOException e){
 			throw new RuntimeException(e);
@@ -259,7 +260,7 @@ public class main{
 					}
 				}
 			}else{
-				//TODO: Throw exception
+				System.out.println(response.getMessage());
 			}
 		}catch(IOException e){
 			throw new RuntimeException(e);
@@ -283,7 +284,8 @@ public class main{
 		for(int i = 0; i < 8; i++){
 
 			sb.append(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_DARK_GREY + " "+(i+1) + " " + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR);
-			for(int j = 0; j < 8; j++){
+			for(int j = 7; j >= 0; j--){
+
 				ChessPieceI piece = board[i][j];
 				if(i%2==j%2){
 					sb.append(EscapeSequences.SET_BG_COLOR_BLACK);
@@ -336,7 +338,7 @@ public class main{
 		for(int i = 7; i >= 0; i--){
 
 			sb.append(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_DARK_GREY + " "+(i+1) + " " + EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR);
-			for(int j = 7; j >= 0; j--){
+			for(int j = 0; j < 8; j++){
 				ChessPieceI piece = board[i][j];
 				if(i%2==j%2){
 					sb.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
@@ -384,56 +386,5 @@ public class main{
 		sb.append("\033[0m");
 		System.out.println(sb);
 	}
-/*
-	public void drawBoard(ChessBoardI chessBoard){
 
-		if( chessBoard == null){
-			System.out.println("There was a problem finding the board");
-			return;
-		}
-		ChessPieceI[][] board = chessBoard.getBoard();
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + "    1    2    3    4    5    6    7    8  "+EscapeSequences.RESET_BG_COLOR+"\n");
-		for(int i = 0; i < 8; i++){
-
-			sb.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + " "+(i+1) + " " + EscapeSequences.RESET_BG_COLOR);
-			for(int j = 0; j < 8; j++){
-				ChessPieceI piece = board[i][j];
-
-				if(piece == null){
-					sb.append(EscapeSequences.SET_BG_COLOR_BLACK+"  ");
-				}else{
-					String color;
-					if(piece.getTeamColor().toString() == "WHITE"){
-						color = EscapeSequences.SET_TEXT_COLOR_WHITE;
-					}else{
-						color = EscapeSequences.SET_TEXT_COLOR_BLACK;
-					}
-					String type="";
-					if(piece.getPieceType().toString() == "KING"){
-						type = EscapeSequences.WHITE_KING;
-					}else if(piece.getPieceType().toString() == "QUEEN"){
-						type = EscapeSequences.WHITE_QUEEN;
-					}else if(piece.getPieceType().toString() == "KNIGHT"){
-						type = EscapeSequences.BLACK_KNIGHT;
-					}else if(piece.getPieceType().toString() == "BISHOP"){
-						type = EscapeSequences.BLACK_BISHOP;
-					}else if(piece.getPieceType().toString() == "ROOK"){
-						type = EscapeSequences.BLACK_ROOK;
-					}else if(piece.getPieceType().toString() == "PAWN"){
-						type = EscapeSequences.BLACK_PAWN;
-					}
-
-
-					sb.append(color + type + EscapeSequences.RESET_TEXT_COLOR);
-				}
-				sb.append(" ");
-			}
-			sb.append(EscapeSequences.RESET_BG_COLOR + "\n");
-		}
-		sb.append(EscapeSequences.RESET_BG_COLOR);
-		System.out.println(sb);
-	}
-*/
 }

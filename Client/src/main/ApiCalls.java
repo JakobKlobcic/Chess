@@ -36,23 +36,46 @@ public class ApiCalls{
 			requestBody.write(inputData.getBytes());
 			requestBody.flush();
 		}
-		StringBuilder content;
 
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+		StringBuilder content = new StringBuilder();
 
-			String line;
-			content = new StringBuilder();
+		if (connection.getResponseCode() == 200) {
+			try( BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 
-			while ((line = br.readLine()) != null) {
-				content.append(line);
-				content.append(System.lineSeparator());
+				String line;
+
+				while ((line = br.readLine()) != null) {
+					content.append(line);
+					content.append(System.lineSeparator());
+				}
 			}
-		} finally {
-			connection.disconnect();
+		} else {
+			try( BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
+
+				String line;
+
+				while ((line = br.readLine()) != null) {
+					content.append(line);
+					content.append(System.lineSeparator());
+				}
+			} catch(Exception exception){
+				exception.printStackTrace();
+			}
 		}
 
-		RegisterResponse registerResponse = gson.fromJson(content.toString(), RegisterResponse.class);
-		registerResponse.setStatus(connection.getResponseCode());
+		connection.disconnect();
+
+
+		RegisterResponse registerResponse;
+
+		if (connection.getResponseCode() == 200) {
+			registerResponse = gson.fromJson(content.toString(), RegisterResponse.class);
+			registerResponse.setStatus(connection.getResponseCode());
+		} else {
+			registerResponse = new RegisterResponse();
+			registerResponse.setMessage(content.toString());
+			registerResponse.setStatus(connection.getResponseCode());
+		}
 
 		return registerResponse;
 	}
@@ -69,7 +92,7 @@ public class ApiCalls{
 		connection.setDoOutput(true);
 
 		connection.addRequestProperty("Content-Type", "application/json");
-		connection.addRequestProperty("authorization", authToken+"j");
+		connection.addRequestProperty("authorization", authToken);
 
 		connection.connect();
 
@@ -118,7 +141,7 @@ public class ApiCalls{
 		return createGameResponse;
 	}
 
-	public static ListGamesResponse listGames(String authToken) throws IOException{
+	public static ListGamesResponse listGames(String authToken) throws IOException {
 		Gson gson = new Gson();
 		URL url = new URL(source + "/game");
 
@@ -131,23 +154,40 @@ public class ApiCalls{
 
 		connection.connect();
 
-		StringBuilder content;
+		StringBuilder content = new StringBuilder();
 
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-
-			String line;
-			content = new StringBuilder();
-
-			while ((line = br.readLine()) != null) {
-				content.append(line);
-				content.append(System.lineSeparator());
+		if (connection.getResponseCode() == 200) {
+			try ( BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+				String line;
+				while((line = br.readLine()) != null){
+					content.append(line);
+					content.append(System.lineSeparator());
+				}
 			}
-		} finally {
-			connection.disconnect();
+		} else {
+			try ( BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
+				String line;
+				while((line = br.readLine()) != null){
+					content.append(line);
+					content.append(System.lineSeparator());
+				}
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
 		}
 
-		ListGamesResponse listGamesResponse = gson.fromJson(content.toString(), ListGamesResponse.class);
-		listGamesResponse.setStatus(connection.getResponseCode());
+		connection.disconnect();
+
+		ListGamesResponse listGamesResponse;
+
+		if (connection.getResponseCode() == 200) {
+			listGamesResponse = gson.fromJson(content.toString(), ListGamesResponse.class);
+			listGamesResponse.setStatus(connection.getResponseCode());
+		} else {
+			listGamesResponse = new ListGamesResponse();
+			listGamesResponse.setMessage(content.toString());
+			listGamesResponse.setStatus(connection.getResponseCode());
+		}
 
 		return listGamesResponse;
 	}
@@ -170,28 +210,47 @@ public class ApiCalls{
 			requestBody.flush();
 		}
 
-		StringBuilder content;
+		StringBuilder content = new StringBuilder();
 
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-
-			String line;
-			content = new StringBuilder();
-
-			while ((line = br.readLine()) != null) {
-				content.append(line);
-				content.append(System.lineSeparator());
+		if (connection.getResponseCode() == 200) {
+			try ( BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+				String line;
+				while((line = br.readLine()) != null){
+					content.append(line);
+					content.append(System.lineSeparator());
+				}
 			}
-		} finally {
-			connection.disconnect();
+		} else {
+			try ( BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
+				String line;
+				while((line = br.readLine()) != null){
+					content.append(line);
+					content.append(System.lineSeparator());
+				}
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
 		}
 
-		LoginResponse loginResponse = gson.fromJson(content.toString(), LoginResponse.class);
-		loginResponse.setStatus(connection.getResponseCode());
+		connection.disconnect();
+
+		LoginResponse loginResponse;
+
+		if (connection.getResponseCode() == 200) {
+			loginResponse = gson.fromJson(content.toString(), LoginResponse.class);
+			loginResponse.setStatus(connection.getResponseCode());
+		} else {
+			loginResponse = new LoginResponse();
+			loginResponse.setMessage(content.toString());
+			loginResponse.setStatus(connection.getResponseCode());
+		}
 
 		return loginResponse;
 	}
 
-	public static LogoutResponse logout(String authtoken) throws IOException {
+	public static LogoutResponse logout(String authToken) throws IOException {
+		Gson gson = new Gson();
+
 		URL url = new URL(source + "/session");
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -199,14 +258,34 @@ public class ApiCalls{
 		connection.setRequestMethod("DELETE");
 
 		connection.addRequestProperty("Content-Type", "application/json");
-		connection.addRequestProperty("authorization", authtoken);
+		connection.addRequestProperty("authorization", authToken);
 
 		connection.connect();
 
-		LogoutResponse logoutResponse = new LogoutResponse();
-		logoutResponse.setStatus(connection.getResponseCode());
+		StringBuilder content=new StringBuilder();
+
+		if (connection.getResponseCode() != 200) {
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream()))){
+				String line;
+				while((line = br.readLine()) != null){
+					content.append(line);
+					content.append(System.lineSeparator());
+				}
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
+		}
 
 		connection.disconnect();
+
+		LogoutResponse logoutResponse = new LogoutResponse();
+
+		if (connection.getResponseCode() == 200) {
+			logoutResponse.setStatus(connection.getResponseCode());
+		} else {
+			logoutResponse.setMessage(content.toString());
+			logoutResponse.setStatus(connection.getResponseCode());
+		}
 
 		return logoutResponse;
 	}
@@ -217,16 +296,14 @@ public class ApiCalls{
 
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
+		connection.setRequestProperty("Content-Type", "application/json");
+		connection.setRequestProperty("authorization", authorization);
 		connection.setReadTimeout(5000);
 		connection.setRequestMethod("PUT");
 		connection.setDoOutput(true);
-
-		connection.addRequestProperty("Content-Type", "application/json");
-		connection.addRequestProperty("authorization", authorization);
-
 		connection.connect();
 
-		try(OutputStream requestBody = connection.getOutputStream()) {
+		try (OutputStream requestBody = connection.getOutputStream()) {
 			String inputData;
 
 			if(playerColor != null) {
@@ -239,8 +316,29 @@ public class ApiCalls{
 			requestBody.flush();
 		}
 
+		StringBuilder content = new StringBuilder();
+
+		if (connection.getResponseCode() != 200) {
+			try ( BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
+				String line;
+				while((line = br.readLine()) != null){
+					content.append(line);
+					content.append(System.lineSeparator());
+				}
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
+		}
+
+		connection.disconnect();
 		JoinGameResponse joinGameResponse = new JoinGameResponse();
-		joinGameResponse.setStatus(connection.getResponseCode());
+
+		if (connection.getResponseCode() == 200) {
+			joinGameResponse.setStatus(connection.getResponseCode());
+		} else {
+			joinGameResponse.setMessage(content.toString());
+			joinGameResponse.setStatus(connection.getResponseCode());
+		}
 
 		return joinGameResponse;
 	}

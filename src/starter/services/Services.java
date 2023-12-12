@@ -69,7 +69,7 @@ public class Services{
 			id = gameData.createGame(request.getGameName());
 		}catch(DataAccessException e){
 			res.setStatus(500);
-			res.setMessage("Error: description");
+			res.setMessage("Error: "+e);
 			return res;
 		}
 

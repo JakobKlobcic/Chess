@@ -21,4 +21,8 @@ public class ListGamesResponse extends Response{
 	public Set<Game> getGames(){
 		return games;
 	}
+
+	public int getGameCount(){
+		return games.size();
+	}
 }
