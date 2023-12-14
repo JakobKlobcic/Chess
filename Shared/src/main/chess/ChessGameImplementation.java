@@ -63,15 +63,15 @@ public class ChessGameImplementation implements ChessGame{
 		return moves;
 	}
 
-	boolean isValidMove(ChessMove move){
+	public boolean isValidMove(ChessMove move){
 		ChessBoardI tempboard = new ChessBoardI();
 		tempboard.setBoard(board.getBoardCopy());
 
-        if(board.getPiece(move.getStartPosition()) == null){
+        if(tempboard.getPiece(move.getStartPosition()) == null){
             return false;
         }
 
-		TeamColor movedPieceColor = board.getPiece(move.getStartPosition()).getTeamColor();
+		TeamColor movedPieceColor = tempboard.getPiece(move.getStartPosition()).getTeamColor();
 
         if(movedPieceColor != turn){
             return false;
@@ -84,16 +84,16 @@ public class ChessGameImplementation implements ChessGame{
 			return false;
 		}
 
-		board.makeMove((ChessMoveI)move);
+		tempboard.makeMove((ChessMoveI)move);
 		recalculateMoves();
 
 		if(movedPieceColor == TeamColor.WHITE && isInCheck(TeamColor.WHITE) || movedPieceColor == TeamColor.BLACK && isInCheck(TeamColor.BLACK)){
-			board.makeMove(new ChessMoveI(((ChessMoveI)move).ending, ((ChessMoveI)move).starting));
+			tempboard.makeMove(new ChessMoveI(((ChessMoveI)move).ending, ((ChessMoveI)move).starting));
 			recalculateMoves();
-			board.setBoard(tempboard.getBoardCopy());
+			tempboard.setBoard(board.getBoardCopy());
 			return false;
 		}
-		board.setBoard(tempboard.getBoardCopy());
+		tempboard.setBoard(board.getBoardCopy());
 
 
 		return true;

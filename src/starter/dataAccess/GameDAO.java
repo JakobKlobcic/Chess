@@ -87,7 +87,7 @@ public class GameDAO{
 		ChessGameImplementation game = new ChessGameImplementation();
 		game.getBoard().resetBoard();
 		int boardId = writeChessBoard((ChessBoardI)game.getBoard());
-		System.out.println(boardId);
+		//System.out.println(boardId);
 		Connection conn = null;
 		try {
 			conn = db.getConnection();
@@ -218,19 +218,65 @@ public class GameDAO{
 			}
 		}
 	}
+
+	public void updateChessBoard(ChessBoardI chessBoard, int gameId) throws DataAccessException {
+		System.out.println("Updating board");
+		Connection conn = null;
+		try {
+			conn = db.getConnection();
+			String sql = "UPDATE board B JOIN game G ON B.id = G.board_id SET " +
+					"1_1=?, 1_2=?, 1_3=?, 1_4=?, 1_5=?, 1_6=?, 1_7=?, 1_8=?," +
+					"2_1=?, 2_2=?, 2_3=?, 2_4=?, 2_5=?, 2_6=?, 2_7=?, 2_8=?," +
+					"3_1=?, 3_2=?, 3_3=?, 3_4=?, 3_5=?, 3_6=?, 3_7=?, 3_8=?," +
+					"4_1=?, 4_2=?, 4_3=?, 4_4=?, 4_5=?, 4_6=?, 4_7=?, 4_8=?," +
+					"5_1=?, 5_2=?, 5_3=?, 5_4=?, 5_5=?, 5_6=?, 5_7=?, 5_8=?," +
+					"6_1=?, 6_2=?, 6_3=?, 6_4=?, 6_5=?, 6_6=?, 6_7=?, 6_8=?," +
+					"7_1=?, 7_2=?, 7_3=?, 7_4=?, 7_5=?, 7_6=?, 7_7=?, 7_8=?," +
+					"8_1=?, 8_2=?, 8_3=?, 8_4=?, 8_5=?, 8_6=?, 8_7=?, 8_8=?" +
+					" WHERE G.game_id=?";
+
+			PreparedStatement statement = conn.prepareStatement(sql);
+			int cellIndex = 1;
+			for (int i = 1; i <= 8; i++) {
+
+				for (int j = 1; j <= 8; j++) {
+					ChessPiece piece = chessBoard.getPiece(new ChessPositionI(i, j));
+					int pieceId = 0;
+					if(piece != null){
+						if(piece.getTeamColor().toString()=="WHITE"){
+							pieceId=whitePieces.get(piece.getPieceType().toString());
+						}else{
+							pieceId=blackPieces.get(piece.getPieceType().toString());
+						}
+					}
+
+					statement.setInt(cellIndex++, pieceId);
+				}
+			}
+			statement.setInt(cellIndex, gameId);
+			statement.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DataAccessException(e.toString());
+		} finally {
+			if (conn != null) {
+				db.returnConnection(conn);
+			}
+		}
+	}
 	ChessBoard getChessBoard(ResultSet rs) throws SQLException {
 		ChessBoardI chessBoard = new ChessBoardI();
 		for (int row = 1; row <= 8; row++) {
 			for (int col = 1; col <= 8; col++) {
 				String columnName = row + "_" + col;
 				int pieceInt = rs.getInt(columnName);
-				System.out.println(columnName + " -- " + pieceInt);
+				//System.out.println(columnName + " -- " + pieceInt);
 				ChessPiece piece = getPieceFromId(pieceInt);
 
 				chessBoard.addPiece(new ChessPositionI(row, col), piece);
 			}
 		}
-		System.out.println(chessBoard);
+		//System.out.println(chessBoard);
 		return chessBoard;
 	}
 	String getKey(Map<String, Integer> map, int value) {

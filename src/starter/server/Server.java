@@ -6,8 +6,10 @@ import static spark.Spark.*;
 
 public class Server{
 	public void start(){
+		WebSocketServer webSocket = WebSocketServer.getInstance();
 		System.out.println("Strating server...");
 		port(8080);
+		webSocket.start();
 		delete("/db", Handlers::handleClearApplication);
 		delete("/session", Handlers::handleLogout);
 		post("/session", Handlers::handleLogin);
