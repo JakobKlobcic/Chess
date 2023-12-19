@@ -56,8 +56,8 @@ public class ChessBoardI implements ChessBoard{
 		for(int i = 0; i < 8; i++){
 			for(int j = 0; j < 8; j++){
 				if(board[i][j] != null && board[i][j].getPieceType().toString() == "KING" && board[i][j].team == color){
-					System.out.println(i);
-					System.out.println(j);
+					//System.out.println(i);
+					//System.out.println(j);
 					return new ChessPositionI(i + 1, j + 1);
 				}
 			}
@@ -85,7 +85,7 @@ public class ChessBoardI implements ChessBoard{
 
 	@Override
 	public void resetBoard(){
-		System.out.println("reseting board");
+		//System.out.println("reseting board");
 		board[0][0] = new Rook(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
 		board[0][1] = new Knight(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
 		board[0][2] = new Bishop(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);

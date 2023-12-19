@@ -68,7 +68,8 @@ public class AuthDAO{
 		Connection conn = null;
 
 		conn = db.getConnection();
-		String sql = "SELECT a.token FROM authtoken a INNER JOIN user u ON u.id = a.user_id WHERE u.username = ?";
+
+		String sql = "SELECT a.token FROM authtoken AS a INNER JOIN user AS u ON u.id = a.user_id WHERE u.username = ?";
 		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setString(1, u);
 			ResultSet rs = stmt.executeQuery();

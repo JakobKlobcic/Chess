@@ -182,8 +182,8 @@ public class ChessGameImplementation implements ChessGame{
 	@Override
 	public boolean isInCheckmate(TeamColor teamColor){
 		//TeamColor oppositeTeam = teamColor == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
-		System.out.println(board);
-		System.out.println(whiteMoves);
+		//System.out.println(board);
+		//System.out.println(whiteMoves);
 		//System.out.println(getTeamValidMoves(teamColor));
 		//System.out.println(isInCheck(teamColor));
 		//Returns true if the given team has no way to protect their king from being captured.

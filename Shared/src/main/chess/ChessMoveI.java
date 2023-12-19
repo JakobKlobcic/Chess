@@ -49,6 +49,6 @@ public class ChessMoveI implements ChessMove{
 	}
 
 	public String toString(){
-		return "starting: " + starting.toString() + "\nending: " + ending.toString() + "\n";
+		return "starting: " + starting.toString() + "; ending: " + ending.toString() + "\n";
 	}
 }
