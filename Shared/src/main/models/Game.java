@@ -38,12 +38,13 @@ public class Game{
 
 	Set<String> spectators = new HashSet<>();
 
-	public Game(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGameImplementation game){
+	public Game(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGameImplementation game, ChessGame.TeamColor turn){
 		this.gameID = gameID;
 		this.whiteUsername = whiteUsername;
 		this.blackUsername = blackUsername;
 		this.gameName = gameName;
 		this.game = game;
+		this.game.setTeamTurn(turn);
 	}
 
 	@Override
@@ -105,6 +106,7 @@ public class Game{
 	public void setSpectators(Set<String> spectators){
 		this.spectators=spectators;
 	}
+
 
 
 }

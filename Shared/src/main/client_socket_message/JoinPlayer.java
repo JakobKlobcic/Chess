@@ -21,4 +21,8 @@ public class JoinPlayer extends UserGameCommand{
 	public ChessGame.TeamColor getPlayerColor(){
 		return playerColor;
 	}
+
+	public String getAuthToken(){
+		return super.getAuthString();
+	}
 }

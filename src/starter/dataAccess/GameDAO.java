@@ -47,6 +47,7 @@ public class GameDAO{
 					"       game.game_name, \n" +
 					"       game.board_id, \n" +
 					"       board.* \n" +
+					"		game.turn \n" +
 					"FROM game \n" +
 					"LEFT JOIN user AS white_user ON game.white_user_id = white_user.id \n" +
 					"LEFT JOIN user AS black_user ON game.black_user_id = black_user.id \n" +
@@ -66,7 +67,7 @@ public class GameDAO{
 				}
 				ChessGameImplementation chess = new ChessGameImplementation();
 				chess.setBoard(getChessBoard(rs));
-				game = new Game(rs.getInt("game_id"), whiteUser, blackUser, rs.getString("game_name"), chess);
+				game = new Game(rs.getInt("game_id"), whiteUser, blackUser, rs.getString("game_name"), chess, rs.getString("turn").equals("WHITE")?ChessGame.TeamColor.WHITE:ChessGame.TeamColor.BLACK);
 			}
 			if(game==null){
 				return null;
@@ -83,7 +84,6 @@ public class GameDAO{
 		}
 	}
 	public int createGame(String name)throws DataAccessException{
-		System.out.println("creating game");
 		ChessGameImplementation game = new ChessGameImplementation();
 		game.getBoard().resetBoard();
 		int boardId = writeChessBoard((ChessBoardI)game.getBoard());
@@ -163,7 +163,6 @@ public class GameDAO{
 	//}
 
 	int writeChessBoard(ChessBoardI chessBoard) throws DataAccessException {
-		System.out.println("createing board");
 		Connection conn = null;
 		try {
 			conn = db.getConnection();
@@ -220,7 +219,6 @@ public class GameDAO{
 	}
 
 	public void updateChessBoard(ChessBoardI chessBoard, int gameId) throws DataAccessException {
-		System.out.println("Updating board");
 		Connection conn = null;
 		try {
 			conn = db.getConnection();
@@ -350,7 +348,7 @@ public class GameDAO{
 			createStmt.setInt(2, gameID);
 			createStmt.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println(e);
+			System.out.println("HTTP: "+e);
 			throw new DataAccessException(e.toString());
 		}finally {
 			if (conn != null) {

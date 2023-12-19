@@ -24,7 +24,7 @@ public class Services{
 	 * operation.
 	 */
 	public static ClearApplicationResponse clearApplication(ClearApplicationRequest request){
-		System.out.println("clearing application");
+		System.out.println("HTTP: clearing application");
 		ClearApplicationResponse res = new ClearApplicationResponse();
 		try{
 			userData.clearDb();
@@ -45,7 +45,7 @@ public class Services{
 	 * @return A {@code CreateGameResponse} object representing the result of the create game operation.
 	 */
 	public static CreateGameResponse createGame(CreateGameRequest request){
-		System.out.print("creating game: ");
+		System.out.print("HTTP: creating game: ");
 		CreateGameResponse res = new CreateGameResponse();
 		int id = 0;
 		try{
@@ -86,7 +86,7 @@ public class Services{
 	 * @return A {@code JoinGameResponse} object representing the result of the join game operation.
 	 */
 	public static JoinGameResponse joinGame(JoinGameRequest request){
-		System.out.println("joining game: "+request.getGameID()+"; "+request.getHeader("authorization"));
+		System.out.println("HTTP: joining game: "+request.getGameID()+"; "+request.getHeader("authorization") +" as "+request.getPlayerColor());
 		JoinGameResponse res = new JoinGameResponse();
 		try{
 			if(!(request.getHeader("authorization") != null && authData.tokenExists(request.getHeader("authorization")))){
@@ -96,7 +96,7 @@ public class Services{
 			}
 
 			if(request.getGameID() == null){
-				System.out.println("join game bad request");
+				System.out.println("HTTP: join game bad request");
 				res.setStatus(400);
 				res.setMessage("Error: bad request");
 				return res;
@@ -129,7 +129,7 @@ public class Services{
 				game.setBlackUsername(authData.username(request.getHeader("authorization")));
 			}
 		}catch(DataAccessException e){
-			System.out.println(e);
+			System.out.println("HTTP: "+e);
 			res.setStatus(500);
 			res.setMessage("Error: "+e);
 			return res;
@@ -145,7 +145,7 @@ public class Services{
 	 * @return A {@code ListGamesResponse} object representing the result of the list games operation.
 	 */
 	public static ListGamesResponse listGames(ListGamesRequest request){
-		System.out.println("listing games");
+		System.out.println("HTTP: listing games");
 		ListGamesResponse res = new ListGamesResponse();
 		try{
 			if(!(request.getHeader("authorization") != null && authData.tokenExists(request.getHeader("authorization")))){
@@ -175,7 +175,7 @@ public class Services{
 	 * @return A {@code LoginResponse} object representing the result of the login operation.
 	 */
 	public static LoginResponse login(LoginRequest request){
-		System.out.println("logging in");
+		System.out.println("HTTP: logging in");
 		LoginResponse res = new LoginResponse();
 		String token = null;
 		try{
@@ -204,7 +204,7 @@ public class Services{
 	 * @return A {@code LogoutResponse} object representing the result of the logout operation.
 	 */
 	public static LogoutResponse logout(LogoutRequest request){
-		System.out.println("logging out");
+		System.out.println("HTTP: logging out");
 		LogoutResponse res = new LogoutResponse();
 		try{
 			if(!(request.getHeader("authorization") != null && authData.tokenExists(request.getHeader("authorization")))){
@@ -231,7 +231,7 @@ public class Services{
 	 * @return A {@code RegisterResponse} object representing the result of the registration operation.
 	 */
 	public static RegisterResponse registerUser(RegisterRequest request){
-		System.out.println("register user");
+		System.out.println("HTTP: register user");
 		RegisterResponse res = new RegisterResponse();
 
 		if(!(request.getUsername() != null && !request.getUsername().isEmpty()) ||

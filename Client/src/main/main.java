@@ -10,7 +10,6 @@ import server_socket_message.LoadGame;
 import server_socket_message.Notification;
 import ui.EscapeSequences;
 import webSocketMessages.serverMessages.ServerMessage;
-import web_socket.WebSocketClient;
 
 import javax.websocket.MessageHandler;
 import java.io.BufferedReader;
@@ -195,6 +194,10 @@ public class main{
 			JoinGameResponse response = ApiCalls.joinGame(auth, color, gameID);
 			if(response.getStatus()==200){
 				try{
+					currentBoard=getBoard(gameID);
+					currentColor= color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+					currentGameID=gameID;
+
 					socketConnection();
 					inGame=true;
 					Gson gson = new Gson();
@@ -202,9 +205,6 @@ public class main{
 				}catch(Exception e){
 					throw 	new RuntimeException(e);
 				}
-				currentBoard=getBoard(gameID);
-				currentColor= color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-				currentGameID=gameID;
 				//this.drawBoard(currentBoard, currentColor);
 			}else{
 				System.out.println(response.getMessage());
@@ -219,14 +219,14 @@ public class main{
 		try{
 			JoinGameResponse response = ApiCalls.joinGame(auth, null, gameID);
 			if(response.getStatus()==200){
+				currentBoard=getBoard(gameID);
+				currentColor= ChessGame.TeamColor.WHITE;
+				currentGameID=gameID;
 				socketConnection();
 				inGame=true;
 				Gson gson = new Gson();
 				ws.send(gson.toJson(new JoinObserver(auth, gameID)));
-				currentBoard=getBoard(gameID);
-				currentColor= ChessGame.TeamColor.WHITE;
-				currentGameID=gameID;
-				this.drawBoard(currentBoard, currentColor);
+				//this.drawBoard(currentBoard, currentColor);
 			}else{
 				System.out.println(response.getMessage());
 			}
@@ -322,7 +322,7 @@ public class main{
 			if(Character.isDigit(starting.charAt(0)) && Character.isLetter(starting.charAt(1)) && Character.isDigit(ending.charAt(0)) && Character.isLetter(ending.charAt(1))){
 				ChessPositionI s = new ChessPositionI(Character.getNumericValue(starting.charAt(0)), starting.charAt(1)-'a'+1);
 				ChessPositionI e = new ChessPositionI(Character.getNumericValue(ending.charAt(0)), ending.charAt(1)-'a'+1);
-				System.out.println("Starting: "+ s + "; Ending:"+e);
+				//System.out.println("Starting: "+ s + "; Ending:"+e);
 				Gson gson = new Gson();
 				try{
 					ws.send(gson.toJson(new MakeMove(auth,currentGameID,new ChessMoveI(s,e))));
@@ -330,11 +330,12 @@ public class main{
 					throw new RuntimeException(ex);
 				}
 				//drawBoard(currentBoard,currentColor, position);
-				requestInput();
+
 			}
 		}else{
 			//problem
 		}
+		requestInput();
 	}
 
 	public void legal(String pieceLocation){
@@ -394,7 +395,7 @@ public class main{
 			System.out.println("There was a problem finding the board");
 			return;
 		}
-
+		System.out.println();
 		ChessPieceI[][] board = chessBoard.getBoard();
 		StringBuilder sb = new StringBuilder();
 		List<ChessPositionI> legalmoves=new ArrayList<>();
@@ -535,42 +536,11 @@ public class main{
 	public void socketConnection(){
 		try{
 			if(ws==null){
-				ws = new WebSocketClient(auth);
-				ws.getSession().addMessageHandler(new MessageHandler.Whole<String>() {
-					public void onMessage(String message) {
-						handleSocketMessage(message);
-					}
-				});
+				ws = new WebSocketClient(auth, currentGameID);
 			}
-			//ws.send("message--");
 		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
 	}
-
-	public static void handleSocketMessage(String message){
-		Gson gson = new Gson();
-		ServerMessage sm = gson.fromJson(message, ServerMessage.class);
-		switch (sm.getServerMessageType()) {
-			case LOAD_GAME:
-				System.out.println(message);
-				LoadGame loadGame = gson.fromJson(message, LoadGame.class);
-				mainObj.drawBoard(loadGame.getGame().getBoardI(), mainObj.currentColor );
-				break;
-
-			case NOTIFICATION:
-				Notification notification = gson.fromJson(message, Notification.class);
-				System.out.println("\033[1A"+notification.getMessage()+"\n");
-				//post notification
-				break;
-
-			case ERROR:
-				Error error = gson.fromJson(message, Error.class);
-				System.out.println(error.getErrorMessage());
-
-		}
-		mainObj.requestInput();
-	}
-
 
 }
